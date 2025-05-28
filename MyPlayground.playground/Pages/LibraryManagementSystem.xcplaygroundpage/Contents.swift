@@ -6,7 +6,6 @@ protocol Borrowable {
     var isBorrowed: Bool { get set }
     
     mutating func checkIn()
-    func isOverdue() -> Bool
 }
 
 extension Borrowable {
@@ -74,8 +73,12 @@ class Library {
             throw LibraryError.alreadyBorrowed
         }
         
+        let currentDate: Date = Date()
+        let futureReturnDate = Calendar.current.date(byAdding: .month, value: 1, to: currentDate)
+        
         borrowableItem.isBorrowed = true
-        borrowableItem.borrowDate = Date()
+        borrowableItem.borrowDate = currentDate
+        borrowableItem.returnDate = futureReturnDate
         
         return item
     }
