@@ -201,9 +201,9 @@ final class ViewController: UIViewController {
     }
 
     @objc private func followButtonTapped() {
-            self.followButton.setTitle("Following", for: .normal)
-            self.followButton.isUserInteractionEnabled = false
-        }
+        self.followButton.setTitle("Following", for: .normal)
+        self.followButton.isUserInteractionEnabled = false
+    }
     
     private func addTaggedPostsSection() {
         UIView.animate(withDuration: 0.5) {
