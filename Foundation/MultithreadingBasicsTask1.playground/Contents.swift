@@ -2,12 +2,12 @@ import Foundation
 
 class Counter: @unchecked Sendable {
     var value = 0
-    private let queue = DispatchQueue(label: "counter.queue")
+    private let semaphore = DispatchSemaphore(value: 1)
 
     func increment() {
-        queue.async {
-            self.value += 1
-        }
+        semaphore.wait()
+        self.value += 1
+        semaphore.signal()
     }
 }
 
