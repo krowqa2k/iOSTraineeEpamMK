@@ -1,0 +1,14 @@
+{
+  "app_title": "Arsenal footballers",
+  "image_file_names": [
+    "bundle_1",
+    "bundle_2",
+    "bundle_3",
+    "bundle_4",
+    "bundle_5",
+    "bundle_6",
+    "bundle_7"
+  ],
+  "cell_corner_radius": 16.0,
+  "max_image_count": 5
+}

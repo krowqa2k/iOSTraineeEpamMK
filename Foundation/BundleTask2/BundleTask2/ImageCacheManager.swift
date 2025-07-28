@@ -11,6 +11,7 @@ import UIKit
 final class ImageCacheManager {
     let fileManager = FileManager.default
     static let shared = ImageCacheManager()
+    private init() {}
     
     private let cacheSubDirectoryName = "PicsumImageCache"
     
@@ -28,8 +29,6 @@ final class ImageCacheManager {
         }
         return cacheDir
     }()
-    
-    private init() {}
     
     private func fileName(for url: URL) -> String? {
         return url.absoluteString.data(using: .utf8)?.base64EncodedString()

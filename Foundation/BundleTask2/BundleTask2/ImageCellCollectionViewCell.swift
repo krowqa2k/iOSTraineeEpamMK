@@ -10,7 +10,7 @@ import UIKit
 class ImageCollectionViewCell: UICollectionViewCell {
     static let reuseIdentifier = "ImageCell"
 
-    private let imageView: UIImageView = {
+    let imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
@@ -19,7 +19,7 @@ class ImageCollectionViewCell: UICollectionViewCell {
         return imageView
     }()
 
-    private let activityIndicator: UIActivityIndicatorView = {
+    let activityIndicator: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView(style: .medium)
         indicator.hidesWhenStopped = true
         indicator.translatesAutoresizingMaskIntoConstraints = false
@@ -62,7 +62,7 @@ class ImageCollectionViewCell: UICollectionViewCell {
         Task {
             let downloadedImage = await ImageDownloader.shared.downloadImage(from: imageURL.absoluteString)
             
-            DispatchQueue.main.async {
+            await MainActor.run {
                 self.activityIndicator.stopAnimating()
                 if let image = downloadedImage {
                     self.imageView.image = image
