@@ -30,12 +30,21 @@ class UsersViewModelTests: XCTestCase {
             XCTAssertEqual(self.mockService.fetchUsersCallsCount, 1)
         }
         
-        wait(for: [expectation], timeout: 1.0)
+        waitForExpectations(timeout: 1.0)
     }
 
     // assert that the passed url to api service is correct
     func test_viewModel_whenFetchUsers_passesCorrectUrlToApiService() {
-        // I can't figure out how to test the URL passed to the service, sorry.
+        let sut = makeSut()
+        let correctURL = "https://jsonplaceholder.typicode.com/users"
+        let expectation = expectation(description: "Fetch Users passes correct URL")
+        
+        sut.fetchUsers {
+            expectation.fulfill()
+            XCTAssertEqual(self.mockService.fetchUsersReceivedURLString, correctURL)
+        }
+        
+        waitForExpectations(timeout: 1.0)
     }
     
     // assert that view model users are updated and error message is nil
@@ -52,7 +61,7 @@ class UsersViewModelTests: XCTestCase {
             XCTAssertNil(sut.errorMessage)
         }
         
-        wait(for: [expectation], timeout: 1.0)
+        waitForExpectations(timeout: 1.0)
     }
 
     // assert that view model error message is "Unexpected error"
@@ -67,7 +76,7 @@ class UsersViewModelTests: XCTestCase {
             XCTAssertEqual(sut.errorMessage, "Unexpected error")
         }
         
-        wait(for: [expectation], timeout: 1.0)
+        waitForExpectations(timeout: 1.0)
     }
 
     // assert that view model error message is "Unexpected error"
@@ -81,7 +90,7 @@ class UsersViewModelTests: XCTestCase {
             XCTAssertEqual(sut.errorMessage, "Unexpected error")
         }
         
-        wait(for: [expectation], timeout: 1.0)
+        waitForExpectations(timeout: 1.0)
     }
 
     // assert that view model error message is "Error parsing JSON"
@@ -95,7 +104,7 @@ class UsersViewModelTests: XCTestCase {
             XCTAssertEqual(sut.errorMessage, "Error parsing JSON")
         }
         
-        wait(for: [expectation], timeout: 1.0)
+        waitForExpectations(timeout: 1.0)
     }
 
     // fetch users with successful result and after calling clear() assert users are empty
@@ -108,12 +117,21 @@ class UsersViewModelTests: XCTestCase {
         let expectation = expectation(description: "Clear Users updates users to empty")
         
         sut.fetchUsers {
+            guard !sut.users.isEmpty else {
+                XCTFail("Users should not be empty")
+                return
+            }
+            
             sut.clearUsers()
-            expectation.fulfill()
-            XCTAssertTrue(sut.users.isEmpty)
+            if sut.users.isEmpty {
+                expectation.fulfill()
+                XCTAssertTrue(sut.users.isEmpty)
+            } else {
+                XCTFail("Users were not cleared")
+            }
         }
         
-        wait(for: [expectation], timeout: 1.0)
+        waitForExpectations(timeout: 1.0)
     }
 
     private func makeSut() -> UsersViewModel {

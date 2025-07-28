@@ -29,16 +29,17 @@ final class APIServiceTests: XCTestCase {
         let expectations = expectation(description: "Should complete with invalidURL error")
         
         sut.fetchUsers(urlString: invalidURL) { result in
-            expectations.fulfill()
             switch result {
             case .success(let success):
                 XCTFail("Expected failure, but got success with users: \(success)")
             case .failure(let failure):
                 XCTAssertEqual(failure, .invalidUrl)
             }
+            
+            expectations.fulfill()
         }
         
-        wait(for: [expectations], timeout: 1.0)
+        waitForExpectations(timeout: 1.0)
     }
 
     // assert that method completes with .success(expectedUsers)
@@ -50,25 +51,28 @@ final class APIServiceTests: XCTestCase {
         ]
         """.data(using: .utf8)
         mockURLSession.mockData = response
-        
         let sut = makeSut()
-        
         let urlString = "https://example.com/users"
+        
+        let expectedResponse = [
+            User(id: 1, name: "John Doe", username: "johndoe", email: "johndoe@gmail.com"),
+            User(id: 2, name: "Jane Doe", username: "johndoe", email: "johndoe@gmail.com")
+        ]
         let expectations = expectation(description: "Should complete with success")
         
         sut.fetchUsers(urlString: urlString) { result in
-            expectations.fulfill()
             switch result {
             case .success(let users):
                 XCTAssertEqual(users.count, 2)
-                XCTAssertEqual(users[0].id, 1)
-                XCTAssertEqual(users[1].id, 2)
+                XCTAssertEqual(users, expectedResponse)
             case .failure(let error):
                 XCTFail("Expected success, but got failure with error: \(error)")
             }
+            
+            expectations.fulfill()
         }
         
-        wait(for: [expectations], timeout: 1.0)
+        waitForExpectations(timeout: 1.0)
     }
 
     // assert that method completes with .failure(.parsingError)
@@ -86,16 +90,17 @@ final class APIServiceTests: XCTestCase {
         
         let urlString = "https://example.com/users"
         sut.fetchUsers(urlString: urlString) { result in
-            expectations.fulfill()
             switch result {
             case .success(let success):
                 XCTFail("Expected failure, but got success with users: \(success)")
             case .failure(let failure):
                 XCTAssertEqual(failure, .parsingError)
             }
+            
+            expectations.fulfill()
         }
         
-        wait(for: [expectations], timeout: 1.0)
+        waitForExpectations(timeout: 1.0)
     }
 
     // assert that method completes with .failure(.unexpected)
@@ -107,16 +112,17 @@ final class APIServiceTests: XCTestCase {
         let urlString = "https://example.com/users"
         
         sut.fetchUsers(urlString: urlString) { result in
-            expectations.fulfill()
             switch result {
             case .success(let success):
                 XCTFail("Expected failure, but got success with users: \(success)")
             case .failure(let failure):
                 XCTAssertEqual(failure, .unexpected)
             }
+            
+            expectations.fulfill()
         }
         
-        wait(for: [expectations], timeout: 1.0)
+        waitForExpectations(timeout: 1.0)
     }
 
     // MARK: Fetch Users Async
@@ -136,8 +142,66 @@ final class APIServiceTests: XCTestCase {
         }
     }
 
-    // TODO: Implement test
-    // add other tests for fetchUsersAsync
+    func test_apiService_fetchUsersAsync_whenValidSuccessfulResponse_completesWithSuccess() async {
+        let sut = makeSut()
+        let response = """
+        [
+            { "id": 1, "name": "John Doe", "username": "johndoe", "email": "johndoe@gmail.com" },
+            { "id": 2, "name": "Jane Doe", "username": "johndoe", "email": "johndoe@gmail.com" }
+        ]
+        """.data(using: .utf8)
+        mockURLSession.mockData = response
+        let urlString = "https://example.com/users"
+        
+        let expectedResponse = [
+            User(id: 1, name: "John Doe", username: "johndoe", email: "johndoe@gmail.com"),
+            User(id: 2, name: "Jane Doe", username: "johndoe", email: "johndoe@gmail.com")
+        ]
+        
+        let result = await sut.fetchUsersAsync(urlString: urlString)
+        
+        switch result {
+        case .success(let users):
+            XCTAssertEqual(users.count, 2)
+            XCTAssertEqual(users, expectedResponse)
+        case .failure(let failure):
+            XCTFail("Expected success, but got failure with error: \(failure)")
+        }
+    }
+    
+    func test_apiService_fetchUsersAsync_whenInvalidSuccessfulResponse_completesWithFailure() async {
+        let sut = makeSut()
+        let response = """
+        [
+            { "id": 1, "username": "johndoe", "mail": "johndoe@gmail.com" },
+            { "id": 2, "name": "Jane Doe", "mmail": "johndoe@gmail.com" }
+        ]
+        """.data(using: .utf8)
+        mockURLSession.mockData = response
+        let urlString = "https://example.com/users"
+        
+        let result = await sut.fetchUsersAsync(urlString: urlString)
+        switch result {
+        case .success(let users):
+            XCTFail("Expected failure, but got success with users: \(users)")
+        case .failure(let failure):
+            XCTAssertEqual(failure, .parsingError)
+        }
+    }
+    
+    func test_apiService_fetchUsersAsync_whenError_completesWithFailure() async {
+        let sut = makeSut()
+        mockURLSession.mockError = NSError(domain: "Test Error", code: 2, userInfo: nil)
+        let urlString = "https://example.com/users"
+        
+        let result = await sut.fetchUsersAsync(urlString: urlString)
+        switch result {
+        case .success(let users):
+            XCTFail("Expected failure, but got success with users: \(users)")
+        case .failure(let failure):
+            XCTAssertEqual(failure, .unexpected)
+        }
+    }
 
     private func makeSut() -> APIService {
         APIService(urlSession: mockURLSession)

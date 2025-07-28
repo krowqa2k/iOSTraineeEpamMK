@@ -26,16 +26,16 @@ final class CalculatorTests: XCTestCase {
     
     // Given a non-zero divisor, when dividing, then the result is the quotient
     func test_divideByNonZero() throws {
-        let randomNum = Double.random(in: 1...100)
-        let randomDivisor = Double.random(in: 1...10)
-        XCTAssertNoThrow(try calculator.divide(randomNum, randomDivisor), "Expected no error when dividing by non-zero")
+        let num: Double = 100.0
+        let divisor: Double = 5.0
+        XCTAssertNoThrow(try calculator.divide(num, divisor), "Expected no error when dividing by non-zero")
     }
 
     // Given a zero divisor, when dividing, then it throws a .divisionByZero error
     // use XCTAssertThrowsError, XCTAssertEqual
     func test_divideByZero_throwsError() {
-        let randomNum = Double.random(in: 1...100)
-        let zeroDivisor = 0.0
+        let randomNum: Double = 50.0
+        let zeroDivisor: Double = 0.0
         
         XCTAssertThrowsError(try calculator.divide(randomNum, zeroDivisor)) { error in
             let returnedError = error as? Calculator.CalculatorError
@@ -62,16 +62,16 @@ final class CalculatorTests: XCTestCase {
     
     // Use XCTAssertNotNil and/or XCAssertEqual
     func test_safeSquareRoot_whenPositiveNumber_returnsValue() {
-        let randomNum = Double.random(in: 1...100)
-        let result = calculator.safeSquareRoot(randomNum)
+        let num: Double = 25.0
+        let result = calculator.safeSquareRoot(num)
         
         XCTAssertNotNil(result)
     }
 
     // Use XCTAssertNil
     func test_safeSquareRoot_whenNegativeNumber_returnsNil() {
-        let randomNegativeNum = Double.random(in: -100...0)
-        let result = calculator.safeSquareRoot(randomNegativeNum)
+        let negativeNum: Double = -16.0
+        let result = calculator.safeSquareRoot(negativeNum)
         
         XCTAssertNil(result)
     }
