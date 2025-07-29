@@ -23,11 +23,7 @@ final class ImageCacheManager {
             try? fileManager.createDirectory(at: cacheDirectory, withIntermediateDirectories: true)
         }
     }
-    
-    @objc private func clearCacheOnMemoryWarning() {
-        clearCache()
-    }
-    
+
     private func fileName(for url: String) -> String {
         return url.replacingOccurrences(of: "/", with: "_")
             .replacingOccurrences(of: ":", with: "_")
