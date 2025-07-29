@@ -9,37 +9,33 @@ import Foundation
 import UIKit
 
 final class ImageDownloader {
-    private let cache = ImageCacheManager.shared
+    private let cacheManager = ImageCacheManager.shared
     static let shared = ImageDownloader()
-    
     private init() {}
     
     func downloadImage(from urlString: String) async -> UIImage? {
-        guard let url = URL(string: urlString) else {
-            print("Invalid URL string: \(urlString)")
-            return nil
-        }
-        
-        if let cachedImage = cache.loadImage(for: url) {
-            print("Returning cached image for URL: \(urlString)")
+        if let cachedImage = cacheManager.loadImage(for: urlString) {
             return cachedImage
         }
         
+        guard let url = URL(string: urlString) else {
+            print("Invalid URL: \(urlString)")
+            return nil
+        }
+        
         do {
-            let (data, response) = try await URLSession.shared.data(from: url)
+            let (data, _) = try await URLSession.shared.data(from: url)
+            let image = UIImage(data: data)
             
-            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            if let image = image {
+                cacheManager.saveImage(image, for: urlString)
+                return image
+            } else {
+                print("Failed to create image from data.")
                 return nil
             }
-            
-            guard let image = UIImage(data: data) else {
-                return nil
-            }
-            
-            cache.saveImage(image, for: url)
-            return image
         } catch {
-            print("Error downloading image: \(error.localizedDescription)")
+            print("Error downloading image from \(urlString): \(error.localizedDescription)")
             return nil
         }
     }

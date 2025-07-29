@@ -7,17 +7,16 @@
 
 import UIKit
 
-final class ViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+final class ViewController: UIViewController {
 
     private let imageURLs: [String] = [
-        "https://picsum.photos/id/1015/400/300",
-        "https://picsum.photos/id/1016/400/300",
-        "https://picsum.photos/id/1018/400/300",
-        "https://picsum.photos/id/1020/400/300",
-        "https://picsum.photos/id/1021/400/300",
-        "https://picsum.photos/id/1022/400/300",
-        "https://picsum.photos/id/1023/400/300",
-        "https://picsum.photos/id/1024/400/300"
+        "https://picsum.photos/id/0/5000/3333",
+        "https://picsum.photos/id/1/5000/3333",
+        "https://picsum.photos/id/2/5000/3333",
+        "https://picsum.photos/id/3/5000/3333",
+        "https://picsum.photos/id/4/5000/3333",
+        "https://picsum.photos/id/5/5000/3333",
+        "https://picsum.photos/id/6/5000/3333"
     ]
     
     private lazy var collectionView: UICollectionView = {
@@ -44,16 +43,6 @@ final class ViewController: UIViewController, UICollectionViewDataSource, UIColl
         return label
     }()
 
-    private let downloadAllImagesButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("Download all images", for: .normal)
-        button.backgroundColor = .systemBlue
-        button.setTitleColor(.white, for: .normal)
-        button.layer.cornerRadius = 8
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
-
     private let clearCacheButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Clear cache", for: .normal)
@@ -66,26 +55,20 @@ final class ViewController: UIViewController, UICollectionViewDataSource, UIColl
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
         setupUI()
     }
 
     private func setupUI() {
+        view.backgroundColor = .systemBackground
         view.addSubview(collectionView)
         view.addSubview(cacheSizeLabel)
-        view.addSubview(downloadAllImagesButton)
         view.addSubview(clearCacheButton)
 
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: downloadAllImagesButton.topAnchor, constant: -20),
-
-            downloadAllImagesButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            downloadAllImagesButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            downloadAllImagesButton.bottomAnchor.constraint(equalTo: clearCacheButton.topAnchor, constant: -10),
-            downloadAllImagesButton.heightAnchor.constraint(equalToConstant: 50),
+            collectionView.bottomAnchor.constraint(equalTo: clearCacheButton.topAnchor, constant: -10),
 
             clearCacheButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             clearCacheButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
@@ -98,18 +81,15 @@ final class ViewController: UIViewController, UICollectionViewDataSource, UIColl
             cacheSizeLabel.heightAnchor.constraint(equalToConstant: 20)
         ])
 
-        downloadAllImagesButton.addTarget(self, action: #selector(downloadAllImagesTapped), for: .touchUpInside)
         clearCacheButton.addTarget(self, action: #selector(clearCacheTapped), for: .touchUpInside)
     }
     
     @objc private func clearCacheTapped() {
         ImageCacheManager.shared.clearCache()
     }
+}
 
-    @objc private func downloadAllImagesTapped() {
-        collectionView.reloadData()
-    }
-
+extension ViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return imageURLs.count
     }
